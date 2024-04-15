@@ -1,7 +1,8 @@
-﻿@model IndexViewModel
+﻿@model IndexViewModel2
+@inject IGenreSelectListService service
 
 @{
-    ViewData["Title"] = "Index2";
+    ViewData["Title"] = "Index3";
 }
 
 <h1>Index</h1>
@@ -10,11 +11,11 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-<form asp-action="Filter2" method="get">
+<form asp-action="Filter3" method="get">
     <div class="input-group mb-3">
         <input type="text" class="form-control" asp-for="Title" />
         <div class="input-group-append">
-            <select class="form-control" asp-for="Genre" asp-items="@Model.Genres">
+            <select class="form-control" asp-for="Genre" asp-items="await service.GetGenresAsync()" >
                 <option selected="selected" value="">Please select</option>
             </select>
         </div>
