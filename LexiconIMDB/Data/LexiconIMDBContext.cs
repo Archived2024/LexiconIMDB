@@ -15,5 +15,7 @@ namespace LexiconIMDB.Data
         }
 
         public DbSet<Movie> Movies { get; set; } = default!;
+
+
     }
 }
