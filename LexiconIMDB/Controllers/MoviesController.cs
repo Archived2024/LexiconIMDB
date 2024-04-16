@@ -51,14 +51,7 @@ namespace LexiconIMDB.Controllers
             var model = new IndexViewModel
             {
                 Movies = movies,
-                Genres = movies.Select(m => m.Genre)
-                .Distinct()
-                .Select(g => new SelectListItem
-                {
-                     Text = g.ToString(),
-                     Value = g.ToString()
-                })
-                .ToList()
+                Genres = GetGenres(movies)
             };
 
             return View(model);
@@ -66,20 +59,22 @@ namespace LexiconIMDB.Controllers
 
         public async Task<IActionResult> Filter2(IndexViewModel viewModel)
         {
-            var movies = string.IsNullOrWhiteSpace(viewModel.Title) ?
-               _context.Movies :
-               _context.Movies.Where(m => m.Title.Contains(viewModel.Title));
+            var query = string.IsNullOrWhiteSpace(viewModel.Title) ?
+                _context.Movies :
+                _context.Movies.Where(m => m.Title.Contains(viewModel.Title));
 
-            movies = viewModel.Genre is null ?
-            movies :
-                movies.Where(m => m.Genre == viewModel.Genre);
+
+            query = viewModel.Genre is null ?
+                query :
+                query.Where(m => m.Genre == viewModel.Genre);
+
+            var movies = await query.ToListAsync();
 
             var model = new IndexViewModel
             {
-                Movies = await movies.ToListAsync(),
-                Genres = await _selectListService.GetGenresAsync()
+                Movies = movies,
+                Genres = GetGenres(movies)         //await _selectListService.GetGenresAsync()
             };
-
             return View(nameof(Index2), model);
         }
        
@@ -245,6 +240,18 @@ namespace LexiconIMDB.Controllers
         private bool MovieExists(int id)
         {
             return _context.Movies.Any(e => e.Id == id);
+        }
+
+        private static List<SelectListItem> GetGenres(List<Movie> movies)
+        {
+            return movies.Select(m => m.Genre)
+                .Distinct()
+                .Select(g => new SelectListItem
+                {
+                    Text = g.ToString(),
+                    Value = g.ToString()
+                })
+                .ToList();
         }
     }
 }
